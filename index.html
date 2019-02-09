@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>змейка</title>
+	<style>
+		#can {
+			display: block;
+			margin: 30px auto;
+			background: white;
+		}
+
+		html, body {
+			margin: 0;
+			padding: 0;
+			background-color: black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="can" width="400" height="400"></canvas>
+	<script>
+		const canvas = document.getElementById('can');
+		const ctx = canvas.getContext('2d');
+		var snake = {
+			x: 10, y: 10,
+			pX: 0, pY: 0,
+			tail: 2, trail: []
+		},
+		apple = {
+			x: Math.floor(Math.random()*canvas.width/1.5),
+			y: Math.floor(Math.random()*canvas.height/1.5)
+		},
+		keys = {
+			left: 37,
+			right: 39,
+			up: 38,
+			down: 40
+		},
+		garizond = true, garizond2 = true,
+		vertical = true, vertical2 = true;
+		var score = 0;
+
+		window.onload = function(){
+			setInterval(game, 1000/15);
+			document.addEventListener('keydown', keyDown);
+		};
+
+		function keyDown(e){
+			if(e.keyCode === keys.left){
+				if(garizond){
+					snake.pX = -20;
+					snake.pY = 0;
+					garizond2 = false;
+					vertical = true;
+					vertical2 = true;
+				}
+			}
+			if(e.keyCode === keys.right){
+				if(garizond2){
+					snake.pX = 20;
+					snake.pY = 0;
+					garizond = false;
+					vertical = true;
+					vertical2 = true;
+				}
+			}
+			if(e.keyCode === keys.up){
+				if(vertical){
+					snake.pY = -20;
+					snake.pX = 0;
+					garizond = true;
+					garizond2 = true;
+					vertical2 = false;
+				}
+			}
+			if(e.keyCode === keys.down){
+				if(vertical2){
+					snake.pY = 20;
+					snake.pX = 0;
+					vertical = false;
+					garizond = true;
+					garizond2 = true;
+				}
+			}
+		}
+
+
+		function game(){
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			snake.x += snake.pX;	
+			snake.y += snake.pY;
+			if(snake.x < 0){
+				snake.x = canvas.width - 20;
+			}	
+			if(snake.x > canvas.width){
+				snake.x = 0;
+			}
+			if(snake.y < 0){
+				snake.y = canvas.height - 20;
+			}
+			if(snake.y > canvas.height){
+				snake.y = 0;
+			}
+
+			ctx.fillStyle = 'green';
+			for(let i = snake.trail.length; i--;){
+				let pos = snake.trail[i];
+				ctx.fillRect(pos.x, pos.y, 20, 20);
+				if(snake.x === pos.x && snake.y === pos.y){
+					snake.tail = 2;
+				}
+			}
+
+			snake.trail.push({
+				x: snake.x,
+				y: snake.y
+			});
+
+			while(snake.trail.length > snake.tail){
+				snake.trail.shift();
+			}
+
+			if(snake.x <= apple.x && snake.x + 20 >= apple.x 
+				&& snake.y <= apple.y && snake.y + 20 >= apple.y || snake.x > apple.x && snake.x < apple.x + 20 && snake.y > apple.y && snake.y < apple.y + 20){
+					snake.tail++;
+					apple.x = Math.floor(Math.random()*canvas.width/1.5);
+					apple.y = Math.floor(Math.random()*canvas.height/1.5);
+					score++;
+			}
+
+			ctx.fillStyle = 'red';
+			ctx.fillRect(apple.x, apple.y, 20, 20);
+			text();
+		}
+
+		function text(){
+			ctx.fillStyle = 'black';
+			ctx.font = "20px Arial";
+			ctx.fillText('Очки: ' + score, 10, canvas.height - 10);
+		}
+
+
+	</script>	
+</body>
+</html>
